@@ -1,0 +1,69 @@
+version: "3"
+services:
+  alice:
+    image: bcgovimages/aries-cloudagent:py36-1.16-1_1.0.0-rc0
+    ports:
+      - "3001:3001"
+    command: >
+      start -it http 0.0.0.0 3000
+        --label Alice
+        -ot http
+        -e http://alice:3000
+        --admin 0.0.0.0 3001 --admin-insecure-mode
+        --log-level debug
+        --no-ledger
+        --wallet-type askar
+        --wallet-name alice
+        --wallet-key insecure
+        --auto-provision
+    healthcheck:
+      test: curl -s -o /dev/null -w '%{http_code}' "http://localhost:3001/status/live" | grep "200" > /dev/null
+      start_period: 30s
+      interval: 3s
+      timeout: 5s
+      retries: 5
+
+  mediator:
+    # image: bcgovimages/aries-cloudagent:py36-1.16-1_1.0.0-rc0
+    image: acapy-mediator-admin
+    build:
+      context: .
+    ports:
+      - "3002:3001"
+    command: >
+      start -it http 0.0.0.0 3000
+        --label Mediator
+        -ot http
+        -e http://mediator:3000
+        --admin 0.0.0.0 3001 --admin-insecure-mode
+        --log-level debug
+        --genesis-url https://raw.githubusercontent.com/Indicio-tech/indicio-network/main/genesis_files/pool_transactions_demonet_genesis
+        --no-ledger
+        --wallet-type askar
+        --wallet-name bob
+        --wallet-key insecure
+        --auto-provision
+        --plugin mediator_admin
+    healthcheck:
+      test: curl -s -o /dev/null -w '%{http_code}' "http://localhost:3001/status/live" | grep "200" > /dev/null
+      start_period: 30s
+      interval: 3s
+      timeout: 5s
+      retries: 5
+
+  demo:
+    build:
+      context: demo
+    environment:
+      - ALICE=http://alice:3001
+      - MEDIATOR=http://mediator:3001
+    volumes:
+      - ./demo/mediator_admin_demo.py:/usr/src/app/mediator_admin_demo.py:ro,z
+    command: python -m mediator_admin_demo
+    depends_on:
+      alice:
+        condition: service_healthy
+      mediator:
+        condition: service_healthy
+
+

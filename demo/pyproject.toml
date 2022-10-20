@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "mediator-admin-demo"
+version = "0.1.0"
+description = "Demo of mediator admin functionality"
+authors = ["Daniel Bluhm <dbluhm@pm.me>"]
+license = "Apache-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+controller = {git = "https://github.com/indicio-tech/acapy-minimal-example", rev = "main"}
+
+[tool.poetry.dev-dependencies]
+black = "^22.10.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
