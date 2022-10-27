@@ -46,9 +46,7 @@ class RouteInfoSchema(OpenAPISchema):
     endpoint = fields.Str(required=True)
 
 
-@docs(
-    tags=["mediation"], summary="Get route info for mediator"
-)
+@docs(tags=["mediation"], summary="Get route info for mediator")
 @response_schema(RouteInfoSchema(), 200, description="")
 async def get_route_info(request: web.Request):
     """Get route info for mediator."""
@@ -62,7 +60,7 @@ async def get_route_info(request: web.Request):
     return web.json_response(
         {
             "routing_keys": [routing_did.verkey],
-            "endpoint": context.settings.get("default_endpoint")
+            "endpoint": context.settings.get("default_endpoint"),
         }
     )
 
@@ -70,9 +68,7 @@ async def get_route_info(request: web.Request):
 class ManualKeylistUpdateSchmea(OpenAPISchema):
     """Request schema for manual keylist update."""
 
-    updates = fields.List(
-        fields.Nested(KeylistUpdateRuleSchema()), required=True
-    )
+    updates = fields.List(fields.Nested(KeylistUpdateRuleSchema()), required=True)
 
 
 class KeylistUpdateResultSchema(OpenAPISchema):
@@ -84,9 +80,7 @@ class KeylistUpdateResultSchema(OpenAPISchema):
     )
 
 
-@docs(
-    tags=["mediation"], summary="Get route info for mediator"
-)
+@docs(tags=["mediation"], summary="Manually update a keylist held by mediator")
 @match_info_schema(MediationIdMatchInfoSchema())
 @request_schema(ManualKeylistUpdateSchmea())
 @response_schema(KeylistUpdateResultSchema(), 200, description="")
@@ -102,8 +96,7 @@ async def post_update_keylist(request: web.Request):
 
     try:
         updates: Sequence[KeylistUpdateRule] = [
-            KeylistUpdateRule(**update)
-            for update in body["updates"]
+            KeylistUpdateRule(**update) for update in body["updates"]
         ]
     except KeyError:
         raise web.HTTPBadRequest(reason="updates missing from request body")
@@ -118,9 +111,7 @@ async def post_update_keylist(request: web.Request):
 
     result = await manager.update_keylist(mediation_record, updates)
     return web.json_response(
-        {
-            "updated": [update.serialize() for update in result.updated]
-        }
+        {"updated": [update.serialize() for update in result.updated]}
     )
 
 
@@ -128,8 +119,10 @@ async def register(app: web.Application):
     """Register routes."""
     app.add_routes(
         [
-            web.get("/mediation/route-info", get_route_info, allow_head=False),
-            web.post("/mediation/update-keylist/{mediation_id}", post_update_keylist),
+            web.get("/mediation/mediator/route-info", get_route_info, allow_head=False),
+            web.post(
+                "/mediation/mediator/update-keylist/{mediation_id}", post_update_keylist
+            ),
         ]
     )
 
