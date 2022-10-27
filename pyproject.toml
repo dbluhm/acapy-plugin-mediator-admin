@@ -12,6 +12,9 @@ aiohttp = "^3.8.3"
 aiohttp-apispec = "^2.2.3"
 
 [tool.poetry.dev-dependencies]
+black = "<22.10.0"
+flake8 = "^5.0.4"
+pre-commit = "<2.20.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
