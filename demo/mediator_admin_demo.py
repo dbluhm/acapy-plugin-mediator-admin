@@ -33,7 +33,7 @@ async def main():
         )
         assert invitation.invitation.recipient_keys
         result = await mediator.post(
-            f"/mediation/update-keylist/{med_med.mediation_id}",
+            f"/mediation/mediator/update-keylist/{med_med.mediation_id}",
             json={
                 "updates": [
                     {
