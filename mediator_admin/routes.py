@@ -65,7 +65,7 @@ async def get_route_info(request: web.Request):
     )
 
 
-class ManualKeylistUpdateSchmea(OpenAPISchema):
+class ManualKeylistUpdateSchema(OpenAPISchema):
     """Request schema for manual keylist update."""
 
     updates = fields.List(fields.Nested(KeylistUpdateRuleSchema()), required=True)
@@ -82,7 +82,7 @@ class KeylistUpdateResultSchema(OpenAPISchema):
 
 @docs(tags=["mediation"], summary="Manually update a keylist held by mediator")
 @match_info_schema(MediationIdMatchInfoSchema())
-@request_schema(ManualKeylistUpdateSchmea())
+@request_schema(ManualKeylistUpdateSchema())
 @response_schema(KeylistUpdateResultSchema(), 200, description="")
 async def post_update_keylist(request: web.Request):
     """Manually update keylist for mediation client."""
